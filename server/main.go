@@ -26,7 +26,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const boardWidth, boardHeight, paletteSize = 384, 192, 16
+const boardWidth, boardHeight, paletteSize = 96, 48, 16
 const maxVoiceBytes = 2 << 20
 
 type pixel struct {
@@ -88,7 +88,7 @@ func openStore(path string) (*sharedServer, error) {
 		db.Close()
 		return nil, err
 	}
-	if err = migrateCanvas(db); err != nil {
+	if err = initializeCanvas(db); err != nil {
 		db.Close()
 		return nil, err
 	}
@@ -136,70 +136,21 @@ func (s *sharedServer) allowOrigin(origin string) bool {
 	return ok
 }
 
-// Upgrade the old grid once, then extend its right edge without stretching existing art.
-func migrateCanvas(db *sql.DB) error {
+// Initialize a fresh canvas. A mismatched stored grid requires a deliberate data reset.
+func initializeCanvas(db *sql.DB) error {
 	var width, height int
 	err := db.QueryRow("SELECT width,height FROM canvas_meta WHERE id=1").Scan(&width, &height)
 	if err == nil && width == boardWidth && height == boardHeight {
 		return nil
 	}
-	factor := 1
 	if errors.Is(err, sql.ErrNoRows) {
-		width, height, factor = 64, 48, 4
-	} else if err != nil {
+		_, err = db.Exec("INSERT INTO canvas_meta(id,width,height) VALUES(1,?,?)", boardWidth, boardHeight)
 		return err
-	} else if width != 256 || height != 192 {
-		return fmt.Errorf("unsupported stored canvas size %dx%d", width, height)
 	}
-	rows, err := db.Query("SELECT position,color FROM pixels")
 	if err != nil {
 		return err
 	}
-	type saved struct{ position, color int }
-	var old []saved
-	for rows.Next() {
-		var p saved
-		if err = rows.Scan(&p.position, &p.color); err != nil {
-			rows.Close()
-			return err
-		}
-		old = append(old, p)
-	}
-	err = rows.Err()
-	rows.Close()
-	if err != nil {
-		return err
-	}
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	if _, err = tx.Exec("DELETE FROM pixels"); err != nil {
-		return err
-	}
-	stmt, err := tx.Prepare("INSERT INTO pixels(position,color) VALUES(?,?)")
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-	for _, p := range old {
-		if p.color == 0 || p.position < 0 || p.position >= width*height {
-			continue
-		}
-		for y := 0; y < factor; y++ {
-			for x := 0; x < factor; x++ {
-				position := (p.position/width*factor+y)*boardWidth + p.position%width*factor + x
-				if _, err = stmt.Exec(position, p.color); err != nil {
-					return err
-				}
-			}
-		}
-	}
-	if _, err = tx.Exec("INSERT INTO canvas_meta(id,width,height) VALUES(1,?,?) ON CONFLICT(id) DO UPDATE SET width=excluded.width,height=excluded.height", boardWidth, boardHeight); err != nil {
-		return err
-	}
-	return tx.Commit()
+	return fmt.Errorf("unsupported stored canvas size %dx%d; reset the database to use %dx%d", width, height, boardWidth, boardHeight)
 }
 
 func (s *sharedServer) snapshot() (board, error) {

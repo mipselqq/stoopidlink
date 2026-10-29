@@ -915,8 +915,8 @@ a:focus-visible {
 }
 .pixel-stage {
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   flex: 1;
   min-height: 0;
   container-type: size;

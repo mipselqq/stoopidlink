@@ -8,8 +8,6 @@ import {
   type Pixel,
 } from './shared-api.ts';
 
-// The dot in Jix at this module's 16px font size is exactly 2 × 2 CSS pixels.
-const DISPLAY_PIXEL = 2;
 export function mount(host: HTMLElement) {
   const state = onlineStatus(host),
     body = state.body;
@@ -37,24 +35,17 @@ export function mount(host: HTMLElement) {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   };
-  // Keep the visible grid at the font's pixel size on both narrow and wide windows.
-  // All clients still paint the same persistent 384 × 192 board; this is only its view.
+  // Fit the shared grid into the available panel without changing its aspect ratio.
   const resize = () => {
-    if (!board) return;
-    const columns = Math.max(
-      2,
-      Math.floor(
-        Math.min(
-          board.width,
-          stage.clientWidth / DISPLAY_PIXEL,
-          ((stage.clientHeight / DISPLAY_PIXEL) * board.width) / board.height,
-        ) / 2,
-      ) * 2,
+    if (!board || !stage.clientWidth || !stage.clientHeight) return;
+    canvas.width = board.width;
+    canvas.height = board.height;
+    const scale = Math.min(
+      Math.max(1, stage.clientWidth - 16) / board.width,
+      Math.max(1, stage.clientHeight - 16) / board.height,
     );
-    canvas.width = columns;
-    canvas.height = Math.round((columns * board.height) / board.width);
-    canvas.style.width = `${columns * DISPLAY_PIXEL}px`;
-    canvas.style.height = `${canvas.height * DISPLAY_PIXEL}px`;
+    canvas.style.width = `${board.width * scale}px`;
+    canvas.style.height = `${board.height * scale}px`;
     render();
   };
   const observer = new ResizeObserver(resize);

@@ -36,12 +36,12 @@ func call(t *testing.T, h http.Handler, method, path, body string) *httptest.Res
 func TestPixelsValidationAndPersistence(t *testing.T) {
 	s, path := testStore(t)
 	h := s.routes("")
-	for _, body := range []string{`[]`, `[{"x":384,"y":0,"color":1}]`, `[{"x":0,"y":-1,"color":1}]`, `[{"x":0,"y":0,"color":16}]`, `[{"x":0,"y":0,"color":1}] {}`, `[{"x":0,"y":0,"color":1,"bad":1}]`} {
+	for _, body := range []string{`[]`, `[{"x":96,"y":0,"color":1}]`, `[{"x":0,"y":-1,"color":1}]`, `[{"x":0,"y":0,"color":16}]`, `[{"x":0,"y":0,"color":1}] {}`, `[{"x":0,"y":0,"color":1,"bad":1}]`} {
 		if w := call(t, h, "POST", "/api/shared/pixels", body); w.Code != 400 {
 			t.Fatalf("invalid pixels accepted: %s (%d)", body, w.Code)
 		}
 	}
-	if w := call(t, h, "POST", "/api/shared/pixels", `[{"x":383,"y":191,"color":7},{"x":0,"y":0,"color":2}]`); w.Code != 204 {
+	if w := call(t, h, "POST", "/api/shared/pixels", `[{"x":95,"y":47,"color":7},{"x":0,"y":0,"color":2}]`); w.Code != 204 {
 		t.Fatal(w.Code, w.Body)
 	}
 	s.db.Close()
@@ -200,58 +200,34 @@ func TestSlowSubscriberDisconnects(t *testing.T) {
 	}
 }
 
-func TestLegacyCanvasKeepsDrawing(t *testing.T) {
+func TestCanvasStartsAtReducedResolution(t *testing.T) {
+	s, _ := testStore(t)
+	b, err := s.snapshot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if b.Width != 96 || b.Height != 48 || len(b.Pixels) != 96*48 {
+		t.Fatalf("unexpected canvas dimensions: %dx%d (%d pixels)", b.Width, b.Height, len(b.Pixels))
+	}
+	for _, color := range b.Pixels {
+		if color != 0 {
+			t.Fatal("fresh canvas should be empty")
+		}
+	}
+}
+
+func TestCanvasRejectsOldResolutionWithoutMigration(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "old.sqlite")
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = db.Exec("CREATE TABLE pixels(position INTEGER PRIMARY KEY,color INTEGER NOT NULL); INSERT INTO pixels VALUES(?,?)", 47*64+63, 6)
+	_, err = db.Exec("CREATE TABLE pixels(position INTEGER PRIMARY KEY,color INTEGER NOT NULL); CREATE TABLE canvas_meta(id INTEGER PRIMARY KEY,width INTEGER,height INTEGER); INSERT INTO canvas_meta VALUES(1,384,192); INSERT INTO pixels VALUES(?,?)", 100*384+200, 3)
 	if err != nil {
 		t.Fatal(err)
 	}
 	db.Close()
-	s, err := openStore(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer s.db.Close()
-	b, err := s.snapshot()
-	if err != nil {
-		t.Fatal(err)
-	}
-	colored := 0
-	for _, color := range b.Pixels {
-		if color == 6 {
-			colored++
-		}
-	}
-	if colored != 16 || b.Pixels[191*boardWidth+255] != 6 {
-		t.Fatal("legacy drawing was lost or shifted")
-	}
-}
-
-func TestWiderCanvasKeepsPixelCoordinates(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "narrow.sqlite")
-	db, err := sql.Open("sqlite3", path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = db.Exec("CREATE TABLE pixels(position INTEGER PRIMARY KEY,color INTEGER NOT NULL); CREATE TABLE canvas_meta(id INTEGER PRIMARY KEY,width INTEGER,height INTEGER); INSERT INTO canvas_meta VALUES(1,256,192); INSERT INTO pixels VALUES(?,?)", 100*256+200, 3)
-	if err != nil {
-		t.Fatal(err)
-	}
-	db.Close()
-	s, err := openStore(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer s.db.Close()
-	b, err := s.snapshot()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if b.Pixels[100*boardWidth+200] != 3 || b.Pixels[100*boardWidth+300] != 0 {
-		t.Fatal("widening stretched or lost the drawing")
+	if _, err = openStore(path); err == nil {
+		t.Fatal("old canvas resolution should require a database reset")
 	}
 }
