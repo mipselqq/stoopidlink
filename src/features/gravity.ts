@@ -17,10 +17,8 @@ export async function mount(host: HTMLElement) {
     tracks = header.levels.flatMap((level, difficulty) =>
       level.map((entry, index) => ({ ...entry, difficulty, index })),
     );
-  const game = new GameShell(
-    host,
-    'GRAVITY DEFIED / SEVASTOPOL ENGINEERING TRIALS. ↑ accelerate · ↓ brake · ← → lean · P pause. Reach the finish without striking your helmet. Original fixed-point physics.',
-  );
+  const game = new GameShell(host);
+  const playButton = host.querySelector<HTMLElement>('[data-play]')!;
   const toolbar = host.querySelector<HTMLElement>('.module-toolbar')!;
   const trackSelect = document.createElement('select');
   trackSelect.className = 'module-select';
@@ -100,24 +98,32 @@ export async function mount(host: HTMLElement) {
     } else if (map[key]) press(map[key], down);
   });
   game.button(
-    'LEAN ◀',
+    'LEAN',
     () => press('left', true),
     () => press('left', false),
+    false,
+    '←',
   );
   game.button(
     'BRAKE',
     () => press('down', true),
     () => press('down', false),
+    false,
+    '↓',
   );
   game.button(
     'DRIVE',
     () => press('up', true),
     () => press('up', false),
+    false,
+    '↑',
   );
   game.button(
-    'LEAN ▶',
+    'LEAN',
     () => press('right', true),
     () => press('right', false),
+    false,
+    '→',
   );
   const next = document.createElement('button');
   next.className = 'module-button';
@@ -130,7 +136,7 @@ export async function mount(host: HTMLElement) {
   };
   toolbar.insertBefore(next, game.status);
   const credits = document.createElement('p');
-  credits.className = 'module-help';
+  credits.className = 'module-help game-credits';
   credits.innerHTML = `Physics: <a href="https://github.com/MihailPreis/Wheelie" target="_blank" rel="noreferrer">Wheelie / Gravity Defied</a> · <a href="${asset('../licenses/gravity-GPL-2.0.txt')}" target="_blank">GPL-2.0</a> · <a href="${asset('games/gravity/source.zip')}" download>source</a>. No warranty.`;
   host.append(credits);
   game.onReset = () => {
@@ -246,8 +252,6 @@ export async function mount(host: HTMLElement) {
       c.fillRect(16, 15, game.width - 32, 5);
       c.fillStyle = COLORS.green;
       c.fillRect(16, 15, (game.width - 32) * Math.max(0, Math.min(1, pose.progress / 65536)), 5);
-      game.text('ENGINEERING TRIAL', 16, 43, COLORS.green);
-      game.text(`${(sim.raceTime / 1000).toFixed(2)} S`, game.width - 120, 43, COLORS.cyan);
       if (finished)
         game.text(
           sim.status === Status.Crashed ? 'RIDER DOWN / RESTART' : 'TRIAL COMPLETE',
@@ -256,8 +260,17 @@ export async function mount(host: HTMLElement) {
           sim.status === Status.Crashed ? COLORS.red : COLORS.amber,
           22,
         );
-      else if (!game.running)
-        game.text('AWAITING RIDER INPUT', game.width / 2 - 130, 110, COLORS.amber, 20);
+      else if (!game.running) {
+        const scale = Math.min(
+          game.canvas.clientWidth / game.canvas.width,
+          game.canvas.clientHeight / game.canvas.height,
+        );
+        const size = parseFloat(getComputedStyle(playButton).fontSize) / (scale || 1);
+        c.save();
+        c.textAlign = 'center';
+        game.text('AWAITING RIDER INPUT', game.width / 2, 110, COLORS.amber, size);
+        c.restore();
+      }
       game.message(
         `${tracks[trackIndex].name.toUpperCase()} / ${['100', '175', '220', '325'][league]} CC / ${(sim.raceTime / 1000).toFixed(2)} S`,
       );

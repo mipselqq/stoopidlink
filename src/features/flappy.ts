@@ -2,10 +2,7 @@ import { GameShell, COLORS } from './game-shell.ts';
 import { GameBest } from './game-best.ts';
 import { HALF_GAP, nextGap } from './flappy-course.ts';
 export function mount(host: HTMLElement) {
-  const game = new GameShell(
-    host,
-    'VENT RUNNER / MAINTENANCE DRONE 04. SPACE, ↑ or tap the viewport to pulse the thruster. Pass the airlocks without touching the ducts.',
-  );
+  const game = new GameShell(host);
   const best = new GameBest(game, { game: 'flappy', level: 0 });
   let y = 180,
     vy = 0,
@@ -40,7 +37,7 @@ export function mount(host: HTMLElement) {
   game.keys((key, down, repeat) => {
     if (down && !repeat && [' ', 'arrowup', 'w'].includes(key)) flap();
   });
-  game.button('THRUSTER PULSE', flap);
+  game.button('PULSE', flap, undefined, false, '↑ ␣');
   game.canvas.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     game.canvas.focus();

@@ -511,13 +511,31 @@ a:focus-visible {
 .game-pad {
   display: flex;
   justify-content: space-between;
-  gap: 6px;
+  gap: 8px;
   flex: none;
 }
 .game-pad button {
   flex: 1;
+  min-width: 0;
+  padding: 7px 6px;
   touch-action: none;
   min-height: 44px;
+}
+.game-toolbar .module-button,
+.game-pad .module-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 6px;
+}
+.game-key {
+  font: inherit;
+  color: #83f7fb;
+  white-space: nowrap;
+}
+.feature-host .game-credits {
+  display: block;
 }
 .module-select {
   font: inherit;
@@ -800,6 +818,19 @@ a:focus-visible {
   height: 16px;
 }
 @container feature (max-width:720px) {
+  .game-toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .game-toolbar .module-status {
+    grid-area: 1 / 1 / 2 / 3;
+  }
+  .game-toolbar [data-play] {
+    grid-area: 2 / 1;
+  }
+  .game-toolbar [data-reset] {
+    grid-area: 2 / 2;
+  }
   [data-feature='gravity'] .module-toolbar {
     display: grid;
     grid-template-columns: minmax(0, 1fr) max-content max-content;
@@ -854,6 +885,11 @@ a:focus-visible {
   }
 }
 @container feature (max-width:360px) {
+  .game-pad .module-button {
+    padding: 7px 2px;
+    gap: 0 4px;
+    font-size: 14px;
+  }
   [data-feature='gravity'] .module-toolbar .module-button {
     padding: 7px 6px;
     font-size: 14px;
@@ -873,6 +909,12 @@ a:focus-visible {
   }
   .video-seek {
     grid-area: 3 / 2 / 4 / 4;
+  }
+}
+@container feature (max-width:300px) {
+  .game-pad .module-button {
+    gap: 0 2px;
+    font-size: 12px;
   }
 }
 

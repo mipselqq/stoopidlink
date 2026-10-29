@@ -37,10 +37,7 @@ const palette = [
   COLORS.red,
 ];
 export function mount(host: HTMLElement) {
-  const game = new GameShell(
-    host,
-    'CARGO STACK / SEEGSON LOGISTICS. ← → move · ↑ rotate · ↓ lower · SPACE drop · P pause. Clear full rows to free storage.',
-  );
+  const game = new GameShell(host);
   const best = new GameBest(game, { game: 'tetris', level: 0 });
   let board: number[][] = [],
     piece: number[][] = [],
@@ -139,11 +136,11 @@ export function mount(host: HTMLElement) {
     if (key === 'arrowdown' || key === 's') drop();
     if (key === ' ' && !repeat) hard();
   });
-  game.button('◀', () => move(-1), undefined, true);
-  game.button('↻', rotate);
-  game.button('▼', drop, undefined, true);
-  game.button('▶', () => move(1), undefined, true);
-  game.button('DROP', hard);
+  game.button('←', () => move(-1), undefined, true);
+  game.button('↻', rotate, undefined, false, '↑');
+  game.button('↓', drop, undefined, true);
+  game.button('→', () => move(1), undefined, true);
+  game.button('DROP', hard, undefined, false, '␣');
   game.onReset = reset;
   reset();
   game.loop(

@@ -21,11 +21,8 @@ export class GameShell {
   private resize: ResizeObserver;
   private releaseControls: (() => void)[] = [];
   onReset = () => {};
-  constructor(
-    readonly host: HTMLElement,
-    help: string,
-  ) {
-    host.innerHTML = `<div class="module-toolbar"><span class="module-status" role="status"><span class="module-message">STANDBY</span><span class="module-best" hidden></span></span><button class="module-button" data-play>START</button><button class="module-button" data-reset>RESTART</button></div><div class="game-stage"><canvas class="game-canvas" width="640" height="360" tabindex="0" aria-label="Station training simulation"></canvas></div><div class="game-pad"></div><p class="module-help">${help}</p>`;
+  constructor(readonly host: HTMLElement) {
+    host.innerHTML = `<div class="module-toolbar game-toolbar"><span class="module-status" role="status"><span class="module-message">STANDBY</span><span class="module-best" hidden></span></span><button class="module-button" data-play>START <kbd class="game-key">P</kbd></button><button class="module-button" data-reset>RESTART</button></div><div class="game-stage"><canvas class="game-canvas" width="640" height="360" tabindex="0" aria-label="Station training simulation"></canvas></div><div class="game-pad"></div>`;
     this.canvas = host.querySelector('canvas')!;
     this.ctx = this.canvas.getContext('2d')!;
     this.resize = new ResizeObserver(() => {
@@ -60,7 +57,8 @@ export class GameShell {
   }
   setRunning(value: boolean) {
     this.running = value;
-    this.host.querySelector('[data-play]')!.textContent = value ? 'PAUSE' : 'RESUME';
+    this.host.querySelector('[data-play]')!.innerHTML =
+      `${value ? 'PAUSE' : 'RESUME'} <kbd class="game-key">P</kbd>`;
     this.last = performance.now();
     this.invalidate();
   }
@@ -132,10 +130,22 @@ export class GameShell {
       { signal: this.abort.signal },
     );
   }
-  button(label: string, down: () => void, up: () => void = () => {}, repeat = false) {
+  button(
+    label: string,
+    down: () => void,
+    up: () => void = () => {},
+    repeat = false,
+    shortcut = '',
+  ) {
     const b = document.createElement('button');
     b.className = 'module-button';
     b.textContent = label;
+    if (shortcut) {
+      const hint = document.createElement('kbd');
+      hint.className = 'game-key';
+      hint.textContent = shortcut;
+      b.append(hint);
+    }
     this.controls.append(b);
     let timer = 0;
     const release = () => {

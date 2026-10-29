@@ -20,7 +20,7 @@ export function mount(host: HTMLElement) {
     disposed = false;
   let worker = new Worker(new URL('./chess-worker.ts', import.meta.url), { type: 'module' });
   host.innerHTML =
-    '<div class="module-toolbar"><span class="module-status" role="status">WHITE TO MOVE</span><select class="module-select" aria-label="Chess difficulty"><option value="200">BOT / CREW</option><option value="800" selected>BOT / OFFICER</option></select><button class="module-button" data-undo>UNDO</button><button class="module-button" data-new>NEW GAME</button></div><div class="game-stage"><div class="chess-board" aria-label="Chess board"></div></div><p class="module-help">SEVASTOPOL RECREATION / STRATEGY TRAINER<br>You play white. Select a piece, then a highlighted square. Promotion is to queen. The station bot searches locally in a worker.</p><p data-moves class="module-help"></p>';
+    '<div class="module-toolbar"><span class="module-status" role="status">WHITE TO MOVE</span><select class="module-select" aria-label="Chess difficulty"><option value="200">BOT / CREW</option><option value="800" selected>BOT / OFFICER</option></select><button class="module-button" data-undo>UNDO</button><button class="module-button" data-new>NEW GAME</button></div><div class="game-stage"><div class="chess-board" aria-label="Chess board"></div></div>';
   const board = host.querySelector<HTMLElement>('.chess-board')!,
     status = host.querySelector<HTMLElement>('.module-status')!;
   const names: Record<PieceSymbol, string> = {
@@ -49,7 +49,6 @@ export function mount(host: HTMLElement) {
         : thinking
           ? 'STATION BOT THINKING…'
           : `${chess.turn() === 'w' ? 'WHITE' : 'BLACK'} TO MOVE${chess.isCheck() ? ' / CHECK' : ''}`;
-    host.querySelector('[data-moves]')!.textContent = chess.history().slice(-10).join(' · ');
   };
   const onReply = (event: MessageEvent) => {
     if (disposed || event.data.id !== id) return;
