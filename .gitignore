@@ -1,0 +1,14 @@
+node_modules/
+dist/
+out/
+.cache/
+tools/vendor/
+tools/**/vendor/
+tools/**/raw/
+artifacts/
+*.log
+
+data/
+.env.local
+.env.*.local
+__pycache__/

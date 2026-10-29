@@ -1,0 +1,7 @@
+dist/
+node_modules/
+data/
+public/
+src/generated/
+tests/fixtures/
+package-lock.json

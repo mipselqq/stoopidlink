@@ -1,0 +1,150 @@
+{
+  "source": "Alien: Isolation DATA/SOUND/UI.BNK",
+  "codec": "Opus, 48 kHz",
+  "events": {
+    "folder-move": {
+      "event": "play_interactive_terminal_left_square_move",
+      "bank": "UI.BNK",
+      "eventId": 777943925,
+      "files": ["assets/audio/folder-move.ogg"],
+      "provenance": [
+        {
+          "objectId": 941541070,
+          "mediaId": 789963469
+        }
+      ],
+      "loop": false,
+      "durationSeconds": [0.1879]
+    },
+    "folder-select": {
+      "event": "play_interactive_terminal_left_square_select",
+      "bank": "UI.BNK",
+      "eventId": 3065653230,
+      "files": ["assets/audio/folder-select.ogg", "assets/audio/folder-select-2.ogg"],
+      "provenance": [
+        {
+          "objectId": 249056658,
+          "mediaId": 290955165
+        },
+        {
+          "objectId": 545286132,
+          "mediaId": 531121714
+        }
+      ],
+      "loop": false,
+      "durationSeconds": [0.3709, 0.4101]
+    },
+    "document-move": {
+      "event": "play_interactive_terminal_right_rectangle_move",
+      "bank": "UI.BNK",
+      "eventId": 2180868208,
+      "files": ["assets/audio/document-move.ogg"],
+      "provenance": [
+        {
+          "objectId": 251605670,
+          "mediaId": 936499441
+        }
+      ],
+      "loop": false,
+      "durationSeconds": [0.1918]
+    },
+    "document-select": {
+      "event": "play_interactive_terminal_right_rectangle_select",
+      "bank": "UI.BNK",
+      "eventId": 1511648851,
+      "files": [
+        "assets/audio/document-select.ogg",
+        "assets/audio/document-select-2.ogg",
+        "assets/audio/document-select-3.ogg",
+        "assets/audio/document-select-4.ogg"
+      ],
+      "provenance": [
+        {
+          "objectId": 239942537,
+          "mediaId": 723193233
+        },
+        {
+          "objectId": 251605670,
+          "mediaId": 936499441
+        },
+        {
+          "objectId": 782554190,
+          "mediaId": 102324801
+        },
+        {
+          "objectId": 941541070,
+          "mediaId": 789963469
+        }
+      ],
+      "loop": false,
+      "durationSeconds": [0.4948, 0.1918, 0.6221, 0.1879]
+    },
+    "boot": {
+      "event": "player_uses_interactive_terminal_boot_up",
+      "bank": "UI.BNK",
+      "eventId": 3514693106,
+      "files": ["assets/audio/boot.ogg"],
+      "provenance": [
+        {
+          "objectId": 497282563,
+          "mediaId": 88064609
+        }
+      ],
+      "loop": false,
+      "durationSeconds": [7.7666]
+    },
+    "shutdown": {
+      "event": "player_uses_interactive_terminal_boot_down",
+      "bank": "UI.BNK",
+      "eventId": 55030405,
+      "files": ["assets/audio/shutdown.ogg"],
+      "provenance": [
+        {
+          "objectId": 216924835,
+          "mediaId": 398964620
+        }
+      ],
+      "loop": false,
+      "durationSeconds": [4.069]
+    },
+    "idle": {
+      "event": "player_uses_interactive_terminal_start",
+      "bank": "UI.BNK",
+      "eventId": 3118301158,
+      "files": ["assets/audio/idle.ogg"],
+      "provenance": [
+        {
+          "objectId": 128748776,
+          "mediaId": 674514229
+        }
+      ],
+      "loop": true,
+      "durationSeconds": [1.8275]
+    },
+    "light-flash": {
+      "event": "Play_InteractiveTerminal_LightFlash",
+      "bank": "DYNAMICLOAD_SCI_HOSPITALLOWER.BNK",
+      "eventId": 3257257451,
+      "files": ["assets/audio/light-flash.ogg"],
+      "provenance": [
+        {
+          "objectId": 14458641,
+          "mediaId": 611502088
+        }
+      ],
+      "loop": false,
+      "durationSeconds": [0.5353]
+    },
+    "impact": {
+      "files": ["assets/audio/impact.ogg"],
+      "source": "https://www.youtube.com/watch?v=U0-BWP2M3kg",
+      "loop": false,
+      "durationSeconds": [4.8943]
+    }
+  },
+  "aliases": {
+    "scroll": "document-move",
+    "error": "light-flash",
+    "back": "folder-select"
+  }
+}

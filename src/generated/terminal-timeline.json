@@ -1,0 +1,972 @@
+{
+  "width": 960,
+  "height": 720,
+  "fps": 24,
+  "frameCount": 95,
+  "rootTimeline": [
+    {
+      "type": "FrameLabelTag",
+      "forceWriteAsLong": "true",
+      "name": "off",
+      "namedAnchor": "false",
+      "frame": 1
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "62",
+      "depth": "1",
+      "forceWriteAsLong": "false",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "true",
+        "nRotateBits": "0",
+        "nScaleBits": "21",
+        "nTranslateBits": "18",
+        "scaleX": "15.154694",
+        "scaleY": "6.8181763",
+        "translateX": "-68037",
+        "translateY": "798"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "63",
+      "depth": "2",
+      "forceWriteAsLong": "true",
+      "name": "terminal_root_mc",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "15",
+        "translateX": "9600",
+        "translateY": "6600"
+      },
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "0",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "62",
+      "depth": "14",
+      "forceWriteAsLong": "false",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "0",
+        "translateX": "0",
+        "translateY": "0"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "65",
+      "depth": "16",
+      "forceWriteAsLong": "false",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "14",
+        "translateX": "4529",
+        "translateY": "495"
+      },
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "0",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject3Tag",
+      "characterId": "68",
+      "depth": "18",
+      "forceWriteAsLong": "true",
+      "name": "Sevastolink_mc",
+      "reserved": "false",
+      "visible": "0",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "15",
+        "translateX": "9861",
+        "translateY": "4189"
+      },
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "0",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject3Tag",
+      "characterId": "74",
+      "depth": "21",
+      "forceWriteAsLong": "true",
+      "name": "SevastoTwinkle_mc",
+      "reserved": "false",
+      "visible": "0",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "16",
+        "translateX": "16531",
+        "translateY": "3579"
+      }
+    },
+    {
+      "type": "PlaceObject3Tag",
+      "characterId": "76",
+      "depth": "23",
+      "forceWriteAsLong": "true",
+      "name": "LM_link_mc",
+      "reserved": "false",
+      "visible": "0",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "15",
+        "translateX": "9861",
+        "translateY": "5445"
+      },
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "0",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject3Tag",
+      "blendMode": "4",
+      "characterId": "80",
+      "depth": "26",
+      "forceWriteAsLong": "true",
+      "name": "nostromo_mc",
+      "reserved": "false",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "true",
+        "nRotateBits": "0",
+        "nScaleBits": "19",
+        "nTranslateBits": "15",
+        "scaleX": "1.7166595",
+        "scaleY": "2.194519",
+        "translateX": "9861",
+        "translateY": "5445"
+      },
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "0",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "81",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "0",
+        "translateX": "0",
+        "translateY": "0"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "83",
+      "depth": "30",
+      "forceWriteAsLong": "false",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "15",
+        "translateX": "9600",
+        "translateY": "7400"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "84",
+      "depth": "32",
+      "forceWriteAsLong": "false",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "15",
+        "translateX": "4981",
+        "translateY": "13339"
+      }
+    },
+    {
+      "type": "PlaceObject3Tag",
+      "blendMode": "4",
+      "characterId": "87",
+      "depth": "33",
+      "forceWriteAsLong": "false",
+      "reserved": "false",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "15",
+        "translateX": "9696",
+        "translateY": "7074"
+      },
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "20",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "89",
+      "depth": "35",
+      "forceWriteAsLong": "false",
+      "frame": 1,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "15",
+        "translateX": "12042",
+        "translateY": "11203"
+      },
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "20",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 2
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "30",
+      "forceWriteAsLong": "false",
+      "frame": 2
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "32",
+      "forceWriteAsLong": "false",
+      "frame": 2
+    },
+    {
+      "type": "FrameLabelTag",
+      "forceWriteAsLong": "true",
+      "name": "trans-in",
+      "namedAnchor": "false",
+      "frame": 2
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "26",
+      "forceWriteAsLong": "false",
+      "frame": 2,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "true",
+        "nRotateBits": "0",
+        "nScaleBits": "19",
+        "nTranslateBits": "15",
+        "scaleX": "1.716629",
+        "scaleY": "2.1944885",
+        "translateX": "9862",
+        "translateY": "5445"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 8,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "36",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "23",
+      "forceWriteAsLong": "false",
+      "frame": 8,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "36",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "26",
+      "forceWriteAsLong": "false",
+      "frame": 8,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "36",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "90",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 8,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "0",
+        "translateX": "0",
+        "translateY": "0"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "91",
+      "depth": "30",
+      "forceWriteAsLong": "false",
+      "ratio": "7",
+      "frame": 8,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "15",
+        "translateX": "5637",
+        "translateY": "12230"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "92",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 12
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 13,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "102",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "23",
+      "forceWriteAsLong": "false",
+      "frame": 13,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "102",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "26",
+      "forceWriteAsLong": "false",
+      "frame": 13,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "102",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "93",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 15
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 17,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "105",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "23",
+      "forceWriteAsLong": "false",
+      "frame": 17,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "105",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "26",
+      "forceWriteAsLong": "false",
+      "frame": 17,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "105",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 18,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "151",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "23",
+      "forceWriteAsLong": "false",
+      "frame": 18,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "151",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "26",
+      "forceWriteAsLong": "false",
+      "frame": 18,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "151",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 23,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "192",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "23",
+      "forceWriteAsLong": "false",
+      "frame": 23,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "192",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "26",
+      "forceWriteAsLong": "false",
+      "frame": 23,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "192",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 27,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "195",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "23",
+      "forceWriteAsLong": "false",
+      "frame": 27,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "195",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "26",
+      "forceWriteAsLong": "false",
+      "frame": 27,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "195",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 28,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "hasAddTerms": "false",
+        "hasMultTerms": "false",
+        "nbits": "1"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "23",
+      "forceWriteAsLong": "false",
+      "frame": 28,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "hasAddTerms": "false",
+        "hasMultTerms": "false",
+        "nbits": "1"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "26",
+      "forceWriteAsLong": "false",
+      "frame": 28,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "hasAddTerms": "false",
+        "hasMultTerms": "false",
+        "nbits": "1"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "94",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 30
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "95",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 35
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "96",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 38
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "97",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 62
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "98",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 66
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "99",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 69
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 86
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "21",
+      "forceWriteAsLong": "false",
+      "frame": 86
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "23",
+      "forceWriteAsLong": "false",
+      "frame": 86
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "26",
+      "forceWriteAsLong": "false",
+      "frame": 86
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "29",
+      "forceWriteAsLong": "false",
+      "frame": 86
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "30",
+      "forceWriteAsLong": "false",
+      "frame": 86
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "100",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 86,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "0",
+        "translateX": "0",
+        "translateY": "0"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "101",
+      "depth": "15",
+      "forceWriteAsLong": "false",
+      "frame": 88,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "0",
+        "translateX": "0",
+        "translateY": "0"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "102",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 88
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "16",
+      "forceWriteAsLong": "false",
+      "frame": 89,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "hasAddTerms": "false",
+        "hasMultTerms": "false",
+        "nbits": "1"
+      }
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 90
+    },
+    {
+      "type": "FrameLabelTag",
+      "forceWriteAsLong": "true",
+      "name": "hold",
+      "namedAnchor": "false",
+      "frame": 90
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "2",
+      "forceWriteAsLong": "false",
+      "frame": 90,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "hasAddTerms": "false",
+        "hasMultTerms": "false",
+        "nbits": "1"
+      }
+    },
+    {
+      "type": "FrameLabelTag",
+      "forceWriteAsLong": "true",
+      "name": "trans-out",
+      "namedAnchor": "false",
+      "frame": 91
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "100",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 91,
+      "matrix": {
+        "type": "MATRIX",
+        "hasRotate": "false",
+        "hasScale": "false",
+        "nRotateBits": "0",
+        "nScaleBits": "0",
+        "nTranslateBits": "0",
+        "translateX": "0",
+        "translateY": "0"
+      }
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "16",
+      "forceWriteAsLong": "false",
+      "frame": 92,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "0",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "15",
+      "forceWriteAsLong": "false",
+      "frame": 93
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "characterId": "102",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 93
+    },
+    {
+      "type": "RemoveObject2Tag",
+      "depth": "18",
+      "forceWriteAsLong": "false",
+      "frame": 94
+    },
+    {
+      "type": "PlaceObject2Tag",
+      "depth": "2",
+      "forceWriteAsLong": "false",
+      "frame": 94,
+      "colorTransform": {
+        "type": "CXFORMWITHALPHA",
+        "alphaMultTerm": "0",
+        "blueMultTerm": "256",
+        "greenMultTerm": "256",
+        "hasAddTerms": "false",
+        "hasMultTerms": "true",
+        "nbits": "10",
+        "redMultTerm": "256"
+      }
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+name: Server / rsync deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: server-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check server changes
+        id: changes
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [[ $GITHUB_EVENT_NAME == workflow_dispatch ]] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            echo 'deploy=true' >>"$GITHUB_OUTPUT"
+          elif git diff --quiet "$BEFORE" HEAD -- server/ go.mod go.sum .github/workflows/server.yml; then
+            echo 'deploy=false' >>"$GITHUB_OUTPUT"
+          else
+            echo 'deploy=true' >>"$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-go@v7
+        if: steps.changes.outputs.deploy == 'true'
+        with:
+          go-version: stable
+          cache-dependency-path: go.sum
+      - name: Test and build Go binary
+        if: steps.changes.outputs.deploy == 'true'
+        env:
+          CGO_ENABLED: '1'
+        run: |
+          go test ./server
+          mkdir -p out
+          go build -tags netgo,osusergo,sqlite_omit_load_extension -trimpath -ldflags='-s -w -linkmode=external -extldflags=-static' -o out/server ./server
+      - name: rsync binary and restart systemd service
+        if: steps.changes.outputs.deploy == 'true'
+        env:
+          SERVER_ADDR: ${{ vars.SERVER_ADDR }}
+          SERVER_PORT: ${{ vars.SERVER_PORT }}
+          SERVER_CORS: ${{ vars.SERVER_CORS || 'mipselqq.uk' }}
+          SERVER_SSH_USER: ${{ vars.SERVER_SSH_USER }}
+          SERVER_SSH_PORT: ${{ vars.SERVER_SSH_PORT }}
+          SERVER_SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_PRIVATE_KEY || secrets.SSH_PRIVATE_KEY }}
+          SERVER_SSH_KNOWN_HOSTS: ${{ secrets.SERVER_SSH_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ $SERVER_ADDR =~ ^[a-zA-Z0-9][a-zA-Z0-9.:-]*$ ]] || { echo 'Set SERVER_ADDR to a hostname or IP.'; exit 1; }
+          if [[ ! $SERVER_PORT =~ ^[1-9][0-9]{0,4}$ ]] || ((SERVER_PORT > 65535)); then echo 'Invalid SERVER_PORT.'; exit 1; fi
+          [[ -z $SERVER_CORS || $SERVER_CORS =~ ^[a-zA-Z0-9.-]+(,[a-zA-Z0-9.-]+)*$ ]] || { echo 'SERVER_CORS must be a comma-separated list of domains.'; exit 1; }
+          ssh_user=${SERVER_SSH_USER:-root}
+          ssh_port=${SERVER_SSH_PORT:-22}
+          [[ $ssh_user =~ ^[a-z_][a-zA-Z0-9_-]*$ ]] || { echo 'Invalid SERVER_SSH_USER.'; exit 1; }
+          if [[ ! $ssh_port =~ ^[1-9][0-9]{0,4}$ ]] || ((ssh_port > 65535)); then echo 'Invalid SERVER_SSH_PORT.'; exit 1; fi
+          [[ -n $SERVER_SSH_PRIVATE_KEY ]] || { echo 'Set the SERVER_SSH_PRIVATE_KEY secret.'; exit 1; }
+          umask 077
+          ssh_dir=$(mktemp -d)
+          remote_dir=
+          cleanup() {
+            status=$?
+            if [[ -n $remote_dir ]]; then ssh -F "$ssh_dir/config" server "rm -rf -- '$remote_dir'" || true; fi
+            rm -rf -- "$ssh_dir"
+            exit "$status"
+          }
+          trap cleanup EXIT
+          printf '%s\n' "$SERVER_SSH_PRIVATE_KEY" >"$ssh_dir/key"
+          if [[ -n $SERVER_SSH_KNOWN_HOSTS ]]; then
+            printf '%s\n' "$SERVER_SSH_KNOWN_HOSTS" >"$ssh_dir/known_hosts"
+          else
+            ssh-keyscan -T 10 -p "$ssh_port" "$SERVER_ADDR" >"$ssh_dir/known_hosts"
+          fi
+          cat >"$ssh_dir/config" <<SSH
+          Host server
+            HostName $SERVER_ADDR
+            User $ssh_user
+            Port $ssh_port
+            IdentityFile $ssh_dir/key
+            UserKnownHostsFile $ssh_dir/known_hosts
+            IdentitiesOnly yes
+            StrictHostKeyChecking yes
+            BatchMode yes
+            ConnectTimeout 15
+          SSH
+          remote_dir=$(ssh -F "$ssh_dir/config" server 'mktemp -d /tmp/stoopidlink.XXXXXXXX')
+          [[ $remote_dir =~ ^/tmp/stoopidlink\.[a-zA-Z0-9]+$ ]] || { remote_dir=; exit 1; }
+          rsync -az -e "ssh -F $ssh_dir/config" out/server "server:$remote_dir/server"
+          ssh -F "$ssh_dir/config" server "if [ \"\$(id -u)\" = 0 ]; then bash -s -- '$remote_dir' '$SERVER_PORT' '$SERVER_CORS'; else sudo -n bash -s -- '$remote_dir' '$SERVER_PORT' '$SERVER_CORS'; fi" <<'DEPLOY'
+          set -euo pipefail
+          upload=$1
+          port=$2
+          cors=$3
+          install -d -m 0755 /usr/local/lib/stoopidlink
+          install -m 0755 "$upload/server" /usr/local/lib/stoopidlink/server.new
+          mv -f /usr/local/lib/stoopidlink/server.new /usr/local/lib/stoopidlink/server
+          cat >/etc/systemd/system/stoopidlink.service.new <<UNIT
+          [Unit]
+          Description=STOOPIDLINK server
+          After=network.target
+          [Service]
+          Type=exec
+          DynamicUser=yes
+          StateDirectory=stoopidlink
+          StateDirectoryMode=0700
+          Environment=TRUSTED_PROXIES=127.0.0.1/32,::1/128
+          Environment=SERVER_CORS=$cors
+          EnvironmentFile=-/etc/stoopidlink/server.env
+          ExecStart=/usr/local/lib/stoopidlink/server -addr :$port -db /var/lib/stoopidlink/shared.sqlite -trusted-proxies \${TRUSTED_PROXIES}
+          AmbientCapabilities=CAP_NET_BIND_SERVICE
+          Restart=on-failure
+          RestartSec=3
+          [Install]
+          WantedBy=multi-user.target
+          UNIT
+          mv -f /etc/systemd/system/stoopidlink.service.new /etc/systemd/system/stoopidlink.service
+          systemctl daemon-reload
+          systemctl enable stoopidlink.service
+          systemctl restart stoopidlink.service
+          systemctl is-active --quiet stoopidlink.service
+          DEPLOY

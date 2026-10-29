@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#061b12" />
+    <meta name="description" content="A personal terminal for STOOPIDLINK." />
+    <title>STOOPIDLINK — Personal Terminal</title>
+  </head>
+  <body>
+    <main id="app" aria-label="Stoopidlink personal terminal"></main>
+    <script id="file-fallback">
+      if (location.protocol === 'file:') location.replace(new URL('./dist/index.html', location.href));
+    </script>
+    <!-- terminal-entry -->
+  </body>
+</html>
