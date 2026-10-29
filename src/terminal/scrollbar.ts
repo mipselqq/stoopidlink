@@ -1,4 +1,6 @@
 // Shared HTML component for file windows and dropdown menus.
+import { displayScale } from '../core/config.ts';
+
 class TerminalScrollbar extends HTMLElement {
   static observedAttributes = ['value', 'max', 'page', 'step'];
   private thumb = document.createElement('span');
@@ -89,8 +91,9 @@ class TerminalScrollbar extends HTMLElement {
     );
   }
   private drag(y: number) {
-    const top = this.getBoundingClientRect().top + this.clientTop;
-    const travel = this.clientHeight - this.thumb.getBoundingClientRect().height;
+    const scale = displayScale();
+    const top = this.getBoundingClientRect().top + this.clientTop * scale;
+    const travel = this.clientHeight * scale - this.thumb.getBoundingClientRect().height;
     this.change(((y - top - this.dragOffset!) / Math.max(1, travel)) * this.max);
   }
 }

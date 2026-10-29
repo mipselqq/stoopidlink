@@ -1,13 +1,14 @@
 import './interface.css';
 import './scrollbar.ts';
-import { asset } from '../core/config.ts';
+import { asset, displayScale } from '../core/config.ts';
 import type { TerminalAction, TerminalContent, TerminalState } from '../core/types.ts';
 import { mountFeature } from '../features/loader.ts';
 import timeline from '../generated/terminal-timeline.json';
 import shapes from '../generated/boot-shapes.json';
+import { SQUARE_FRAMES, SQUARE_FRAME_MS, squareLoaderFrame } from './square-loader.ts';
 
 type DisplayItem = { characterId?: string; opacity: number };
-const MOBILE = '(max-width: 959px), (pointer: coarse)';
+const MOBILE = '(max-width: 1246.7px), (pointer: coarse)';
 
 export class TerminalView {
   readonly root = document.createElement('div');
@@ -24,6 +25,17 @@ export class TerminalView {
   private expanded = false;
   private transitioning = false;
   private observer: ResizeObserver;
+  private squaresReady = Promise.all(
+    SQUARE_FRAMES.map(
+      ({ id }) =>
+        new Promise<void>((resolve) => {
+          const preload = new Image();
+          preload.onload = () => resolve();
+          preload.onerror = () => resolve();
+          preload.src = asset(`ui/original-shape-${id}.svg`);
+        }),
+    ),
+  );
   private bootFrames = Array.from({ length: 95 }, (_, frame) => {
     const display = new Map<string, DisplayItem>();
     for (const mutation of timeline.rootTimeline) {
@@ -125,7 +137,7 @@ export class TerminalView {
           }
         } else if ((event.target as HTMLElement).closest('.body')) {
           event.preventDefault();
-          this.onAction({ type: 'scroll', amount: start.y - touch.clientY });
+          this.onAction({ type: 'scroll', amount: (start.y - touch.clientY) / displayScale() });
           this.touchStart = { x: touch.clientX, y: touch.clientY };
         }
       },
@@ -220,9 +232,9 @@ export class TerminalView {
       const listBounds = folderList.getBoundingClientRect(),
         selectedBounds = selected.getBoundingClientRect();
       if (selectedBounds.left < listBounds.left)
-        folderList.scrollLeft -= listBounds.left - selectedBounds.left;
+        folderList.scrollLeft -= (listBounds.left - selectedBounds.left) / displayScale();
       else if (selectedBounds.right > listBounds.right)
-        folderList.scrollLeft += selectedBounds.right - listBounds.right;
+        folderList.scrollLeft += (selectedBounds.right - listBounds.right) / displayScale();
     }
     const placeholder = this.root.querySelector<HTMLElement>('.document-content')!;
     if (preserved) {
@@ -292,14 +304,16 @@ export class TerminalView {
       .querySelector<HTMLElement>('.file-navigation')!
       .getBoundingClientRect();
     const content = this.root.querySelector<HTMLElement>('.content-box')!.getBoundingClientRect();
-    const rowGap = parseFloat(getComputedStyle(this.root.querySelector('.entry-list')!).rowGap);
+    const scale = displayScale();
+    const rowGap =
+      parseFloat(getComputedStyle(this.root.querySelector('.entry-list')!).rowGap) * scale;
     const fileGap = b.top === navigation.top ? navigation.top - content.bottom : rowGap;
     const folderGap = a.top - navigation.bottom;
     svg
       .querySelector('path')!
       .setAttribute(
         'd',
-        `M ${x1} ${y1} V ${y1 - folderGap / 2} H 9 V ${y2 - fileGap / 2} H ${x2} V ${y2}`,
+        `M ${x1} ${y1} V ${y1 - folderGap / 2} H ${9 * scale} V ${y2 - fileGap / 2} H ${x2} V ${y2}`,
       );
   }
   private async toggleExpanded() {
@@ -307,33 +321,28 @@ export class TerminalView {
     this.transitioning = true;
     this.root.classList.add('is-transitioning');
     // Match boot frames 86 → 88 → 90: full tiles, bottom strips, then clear.
-    // Keep each asset at its original coordinates; stretching the two cropped
-    // SVGs to the same box made the grid jump and alternating them made it blink.
-    await Promise.all(
-      [100, 102].map(
-        (id) =>
-          new Promise<void>((resolve) => {
-            const preload = new Image();
-            preload.onload = () => resolve();
-            preload.onerror = () => resolve();
-            preload.src = asset(`ui/original-shape-${id}.svg`);
-          }),
-      ),
-    );
+    await this.squaresReady;
     const overlay = document.createElement('div');
     overlay.className = 'square-transition';
     overlay.setAttribute('aria-hidden', 'true');
     this.root.append(overlay);
-    for (const id of [100, 102]) {
-      const bounds = shapes[String(id) as keyof typeof shapes];
-      const height = id === 100 ? 607.9 : 578.9;
-      overlay.innerHTML = `<svg viewBox="0 0 960 720" preserveAspectRatio="none"><image href="${asset(`ui/original-shape-${id}.svg`)}" x="${bounds.x}" y="${bounds.y}" width="917.95" height="${height}"/></svg>`;
-      await new Promise((resolve) => setTimeout(resolve, (2 * 1000) / 24));
+    for (const { id } of SQUARE_FRAMES) {
+      overlay.innerHTML = this.squareFrame(id);
+      await new Promise((resolve) => setTimeout(resolve, SQUARE_FRAME_MS));
     }
     this.expanded = !this.expanded;
     this.transitioning = false;
     this.root.classList.remove('is-transitioning');
     this.setState(this.state);
+  }
+  private squareFrame(id: string | undefined, adaptive = matchMedia(MOBILE).matches) {
+    return squareLoaderFrame(
+      id,
+      this.root.clientWidth,
+      this.root.clientHeight,
+      adaptive,
+      asset(`ui/original-shape-${id}.svg`),
+    );
   }
   renderBoot() {
     if (this.state.phase !== 'boot') return;
@@ -352,7 +361,7 @@ export class TerminalView {
     const brand =
       frame < 86
         ? `<div class="boot-brand" style="opacity:${logo?.opacity ?? 0}"><img src="${asset('ui/stoopidlink.svg')}" alt="STOOPIDLINK"><span>AN LM-LINK PRODUCT</span></div>`
-        : shape(logo?.characterId);
+        : this.squareFrame(logo?.characterId, false);
     const progress = shape(display.get('29')?.characterId);
     const copyright =
       frame >= 8 && frame < 86 ? '<div class="boot-copyright">(C) LM-LINK DATA SYSTEMS</div>' : '';
@@ -365,7 +374,8 @@ export class TerminalView {
           )
         : '';
     this.layout();
-    this.root.innerHTML = `<div class="boot-screen"><div class="boot-stage">${brand}${progress}${copyright}${twinkle}${frame >= 88 ? '<div class="topbar">PERSONAL TERMINAL <span class="battery"></span></div>' : ''}</div></div>`;
+    const adaptiveSquares = frame >= 86 && matchMedia(MOBILE).matches;
+    this.root.innerHTML = `<div class="boot-screen">${adaptiveSquares ? this.squareFrame(logo?.characterId) : ''}<div class="boot-stage">${adaptiveSquares ? '' : brand}${progress}${copyright}${twinkle}${frame >= 88 ? '<div class="topbar">PERSONAL TERMINAL <span class="battery"></span></div>' : ''}</div></div>`;
   }
   private renderScreen() {
     const s = this.state,

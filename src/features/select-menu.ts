@@ -1,5 +1,7 @@
 // Keep the select's values and change handler, with a terminal-style popup and rail.
 export function selectMenu(select: HTMLSelectElement) {
+  // Keep the lazy game module independent of the inlined application entry.
+  const displayScale = () => parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
   const abort = new AbortController();
   const button = document.createElement('button');
   button.className = `${select.className} module-select-trigger`;
@@ -57,22 +59,25 @@ export function selectMenu(select: HTMLSelectElement) {
     option.focus({ preventScroll: true });
     const a = option.getBoundingClientRect(),
       b = list.getBoundingClientRect();
-    if (a.top < b.top) list.scrollTop -= b.top - a.top;
-    else if (a.bottom > b.bottom) list.scrollTop += a.bottom - b.bottom;
+    if (a.top < b.top) list.scrollTop -= (b.top - a.top) / displayScale();
+    else if (a.bottom > b.bottom) list.scrollTop += (a.bottom - b.bottom) / displayScale();
     updateRail();
   }
   function open() {
     if (menu.matches(':popover-open')) return;
     const rect = button.getBoundingClientRect(),
-      below = innerHeight - rect.bottom - 8;
-    const above = rect.top - 8,
+      scale = displayScale(),
+      viewportWidth = innerWidth / scale,
+      viewportHeight = innerHeight / scale,
+      below = viewportHeight - rect.bottom / scale - 8;
+    const above = rect.top / scale - 8,
       upwards = below < 160 && above > below;
     const height = Math.min(options.length * 32 + 4, 284, Math.max(64, upwards ? above : below));
-    const width = Math.min(Math.max(rect.width, 260), innerWidth - 16);
+    const width = Math.min(Math.max(rect.width / scale, 260), viewportWidth - 16);
     menu.style.width = `${width}px`;
     menu.style.height = `${height}px`;
-    menu.style.left = `${Math.max(8, Math.min(rect.left, innerWidth - width - 8))}px`;
-    menu.style.top = `${upwards ? rect.top - height - 4 : rect.bottom + 4}px`;
+    menu.style.left = `${Math.max(8, Math.min(rect.left / scale, viewportWidth - width - 8))}px`;
+    menu.style.top = `${upwards ? rect.top / scale - height - 4 : rect.bottom / scale + 4}px`;
     menu.showPopover();
     button.setAttribute('aria-expanded', 'true');
     focusOption(select.selectedIndex);
