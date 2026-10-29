@@ -59,7 +59,7 @@
   color: #779b84;
 }
 :root {
-  --site-scale: 1.3;
+  --site-scale: 1.2;
   zoom: var(--site-scale);
   --scrollbar-width: 10px;
   font-family: Jix, monospace;
@@ -273,8 +273,8 @@ a:focus-visible {
   inset: 0;
   height: auto;
 }
-/* Desktop viewport breakpoints include its 130% page scale. */
-@media (max-width: 1246.7px), (pointer: coarse) {
+/* Desktop viewport breakpoints include its 120% page scale. */
+@media (max-width: 1150.8px), (pointer: coarse) {
   #app {
     position: fixed;
     inset: 0;
@@ -635,7 +635,7 @@ a:focus-visible {
 .chess-square.black-piece {
   color: #83f7fb;
 }
-@media (max-height: 620px), (pointer: fine) and (min-width: 960px) and (max-height: 806px) {
+@media (max-height: 620px), (pointer: fine) and (min-width: 960px) and (max-height: 744px) {
   .terminal-ui .body {
     font-size: 16px;
     line-height: 19px;
@@ -778,7 +778,7 @@ a:focus-visible {
   }
 }
 @media (max-height: 620px) and (min-width: 600px) and (max-width: 959px),
-  (pointer: fine) and (max-height: 806px) and (min-width: 960px) and (max-width: 1246.7px) {
+  (pointer: fine) and (max-height: 744px) and (min-width: 960px) and (max-width: 1150.8px) {
   .terminal-ui .entry-panel {
     --mobile-files-height: var(--mobile-file-height);
   }

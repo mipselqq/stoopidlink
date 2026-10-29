@@ -8,7 +8,7 @@ import shapes from '../generated/boot-shapes.json';
 import { SQUARE_FRAMES, SQUARE_FRAME_MS, squareLoaderFrame } from './square-loader.ts';
 
 type DisplayItem = { characterId?: string; opacity: number };
-const MOBILE = '(max-width: 1246.7px), (pointer: coarse)';
+const MOBILE = '(max-width: 1150.8px), (pointer: coarse)';
 
 export class TerminalView {
   readonly root = document.createElement('div');
