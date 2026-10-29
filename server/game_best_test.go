@@ -29,7 +29,7 @@ func TestOneBestPerGameAndGravityLevelPersists(t *testing.T) {
 		want    int64
 		changed bool
 	}{
-		{`{"game":"tetris","level":0,"value":100}`, 100, true}, {`{"game":"tetris","level":0,"value":90}`, 100, false}, {`{"game":"tetris","level":0,"value":200}`, 200, true},
+		{`{"game":"tetris","level":0,"value":200}`, 200, true}, {`{"game":"tetris","level":0,"value":100}`, 200, false}, {`{"game":"tetris","level":0,"value":300}`, 300, true},
 		{`{"game":"gravity","level":0,"value":15000}`, 15000, true}, {`{"game":"gravity","level":1,"value":12000}`, 12000, true}, {`{"game":"gravity","level":0,"value":18000}`, 15000, false}, {`{"game":"gravity","level":0,"value":13500}`, 13500, true},
 	} {
 		value, changed := post(test.body)
@@ -110,7 +110,7 @@ func TestGameResultBounds(t *testing.T) {
 		{"gravity", 1000, false}, {"gravity", 1005, true},
 		{"gravity", 5820, true}, {"gravity", 3600000, true}, {"gravity", 3600015, false},
 		{"flappy", 1, true}, {"flappy", 10000, true}, {"flappy", 10001, false},
-		{"tetris", 1, false}, {"tetris", 2, true}, {"tetris", 101, false},
+		{"tetris", 1, false}, {"tetris", 2, false}, {"tetris", 100, true}, {"tetris", 101, false},
 		{"tetris", 10000000, true}, {"tetris", 10000002, false},
 	} {
 		t.Run(fmt.Sprintf("%s/%d", test.game, test.value), func(t *testing.T) {

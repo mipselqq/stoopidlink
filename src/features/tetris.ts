@@ -127,20 +127,17 @@ export function mount(host: HTMLElement) {
       }
   };
   const hard = () => {
-    if (!game.running) return;
-    while (!collide(piece, x, y + 1)) {
-      y++;
-      score += 2;
-    }
+    if (!game.running || over) return;
+    while (!collide(piece, x, y + 1)) y++;
     lock();
   };
-  game.keys((key, down) => {
+  game.keys((key, down, repeat) => {
     if (!down) return;
     if (key === 'arrowleft' || key === 'a') move(-1);
     if (key === 'arrowright' || key === 'd') move(1);
     if (key === 'arrowup' || key === 'w') rotate();
     if (key === 'arrowdown' || key === 's') drop();
-    if (key === ' ') hard();
+    if (key === ' ' && !repeat) hard();
   });
   game.button('◀', () => move(-1), undefined, true);
   game.button('↻', rotate);

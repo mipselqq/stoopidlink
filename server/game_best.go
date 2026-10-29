@@ -31,8 +31,8 @@ func validGameResult(input gameResult) bool {
 	case "flappy":
 		return input.Value <= 10000
 	case "tetris":
-		// Hard drops add two points per row; every line-clear reward is even.
-		return input.Value <= 10000000 && input.Value%2 == 0
+		// Only cleared rows award points, in multiples of 100.
+		return input.Value <= 10000000 && input.Value%100 == 0
 	}
 	return false
 }
