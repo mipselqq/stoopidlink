@@ -110,7 +110,7 @@ func TestGameResultBounds(t *testing.T) {
 		{"gravity", 1000, false}, {"gravity", 1005, true},
 		{"gravity", 5820, true}, {"gravity", 3600000, true}, {"gravity", 3600015, false},
 		{"flappy", 1, true}, {"flappy", 10000, true}, {"flappy", 10001, false},
-		{"tetris", 1, false}, {"tetris", 2, false}, {"tetris", 100, true}, {"tetris", 101, false},
+		{"tetris", 1, true}, {"tetris", 2, true}, {"tetris", 100, true}, {"tetris", 101, true},
 		{"tetris", 10000000, true}, {"tetris", 10000002, false},
 	} {
 		t.Run(fmt.Sprintf("%s/%d", test.game, test.value), func(t *testing.T) {
@@ -137,7 +137,7 @@ func TestAbsurdResultsCannotReplaceExistingBest(t *testing.T) {
 		`{"game":"gravity","level":0,"value":15}`,
 		`{"game":"gravity","level":0,"value":990}`,
 		`{"game":"gravity","level":0,"value":-15}`,
-		`{"game":"tetris","level":0,"value":101}`,
+		`{"game":"tetris","level":0,"value":0}`,
 		`{"game":"tetris","level":0,"value":10000002}`,
 		`{"game":"flappy","level":0,"value":10001}`,
 		`{"game":"flappy","level":0,"value":9223372036854775807}`,
@@ -168,5 +168,17 @@ func TestAbsurdResultsCannotReplaceExistingBest(t *testing.T) {
 		if err := s.db.QueryRow("SELECT value FROM game_bests WHERE game=? AND level=0", game).Scan(&got); err != nil || got != want {
 			t.Fatal("invalid result overwrote record", game, got, err)
 		}
+	}
+}
+
+func TestTetrisDropScoreCanSetBest(t *testing.T) {
+	s, _ := testStore(t)
+	w := call(t, http.HandlerFunc(s.submitBest), "POST", "/api/games/best", `{"game":"tetris","level":0,"value":117}`)
+	if w.Code != http.StatusOK {
+		t.Fatal(w.Code, w.Body)
+	}
+	var value int64
+	if err := s.db.QueryRow("SELECT value FROM game_bests WHERE game=? AND level=?", "tetris", 0).Scan(&value); err != nil || value != 117 {
+		t.Fatal(value, err)
 	}
 }

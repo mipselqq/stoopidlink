@@ -17,10 +17,15 @@ const mount = new Function(
   `${stripTypeScriptTypes(source)}; return mount;`,
 );
 
-test('holding Space drops one piece and awards no points without cleared rows', () => {
+test('holding Space awards one hard-drop bonus until the key is released', () => {
   let game: Shell;
   let model: Tetris;
   class Model extends Tetris {
+    dropPoints = 0;
+    hardDrop() {
+      if (!this.over) this.dropPoints += (this.ghostY - this.y) * (1 + Math.floor(this.lines / 10));
+      super.hardDrop();
+    }
     constructor() {
       super(() => 0.5);
       model = this;
@@ -82,7 +87,9 @@ test('holding Space drops one piece and awards no points without cleared rows', 
   game!.running = true;
   game!.input(' ', true, false);
   game!.draw();
-  assert.equal(game!.score, '0');
+  const firstScore = model!.score;
+  assert.ok(firstScore > 0);
+  assert.equal(game!.score, String(firstScore));
   const blocks = filled();
   for (let i = 0; i < 100; i++) {
     game!.input(' ', true, true);
@@ -90,20 +97,20 @@ test('holding Space drops one piece and awards no points without cleared rows', 
   }
   game!.draw();
   assert.equal(filled(), blocks, 'auto-repeat must not drop the following pieces');
-  assert.equal(game!.score, '0');
+  assert.equal(game!.score, String(model!.dropPoints));
   game!.input(' ', false, false);
   game!.input(' ', true, false);
   game!.draw();
   assert.equal(filled(), blocks + 4, 'a fresh press drops the next piece');
-  assert.equal(game!.score, '0');
+  assert.equal(game!.score, String(model!.dropPoints));
   for (let i = 0; i < 200; i++) {
     game!.input(' ', false, false);
     game!.input(' ', true, false);
   }
   assert.equal(model!.over, true);
   game!.draw();
-  assert.equal(game!.score, '0');
-  assert.deepEqual(submitted, [0], 'a zero-score loss never becomes a positive submission');
+  assert.equal(game!.score, String(model!.dropPoints));
+  assert.deepEqual(submitted, [model!.dropPoints], 'the final score is submitted exactly once');
   const finalBoard = structuredClone(model!.board);
   game!.running = true;
   for (let i = 0; i < 200; i++) {
@@ -111,8 +118,8 @@ test('holding Space drops one piece and awards no points without cleared rows', 
     game!.input(' ', true, false);
   }
   assert.deepEqual(model!.board, finalBoard);
-  assert.equal(model!.score, 0);
-  assert.deepEqual(submitted, [0]);
+  assert.equal(model!.score, model!.dropPoints);
+  assert.deepEqual(submitted, [model!.dropPoints]);
 });
 
 const grounded = () => {
@@ -180,16 +187,17 @@ test('SRS uses distinct I and JLSTZ wall and floor kicks', () => {
   assert.deepEqual([game.x, game.y], [4, 16]);
 });
 
-test('lock waits 500ms after contact, while hard drop locks immediately without points', () => {
+test('lock waits 500ms after contact, while hard drop locks immediately with its distance bonus', () => {
   const game = grounded();
   game.tick(0.499);
   assert.equal(game.board.flat().filter(Boolean).length, 0);
   game.tick(0.001);
   assert.equal(game.board.flat().filter(Boolean).length, 4);
   assert.equal(game.score, 0);
+  const distance = game.ghostY - game.y;
   game.hardDrop();
   assert.equal(game.board.flat().filter(Boolean).length, 8);
-  assert.equal(game.score, 0);
+  assert.equal(game.score, distance);
 });
 
 test('time before ground contact does not count toward lock delay', () => {
@@ -242,16 +250,44 @@ test('line clearing keeps existing scoring and reset clears game state', () => {
   assert.equal(game.lockResets, 0);
 });
 
-test('rapid hard drops keep zero score across varied bags, including after game over', () => {
+test('rapid hard drops award only actual distance and stop scoring after game over', () => {
   for (let seed = 1; seed <= 1000; seed++) {
     let random = seed;
     const game = new Tetris(() => {
       random = (Math.imul(random, 1664525) + 1013904223) >>> 0;
       return random / 2 ** 32;
     });
-    for (let press = 0; press < 100; press++) game.hardDrop();
+    let expected = 0;
+    for (let press = 0; press < 100; press++) {
+      if (!game.over) expected += (game.ghostY - game.y) * (1 + Math.floor(game.lines / 10));
+      game.hardDrop();
+    }
     assert.equal(game.over, true);
     assert.equal(game.lines, 0);
-    assert.equal(game.score, 0);
+    assert.equal(game.score, expected);
   }
+});
+
+test('hard drop multiplies distance by the level before any rows are cleared', () => {
+  for (const lines of [0, 9, 10, 29]) {
+    const game = grounded();
+    game.lines = lines;
+    game.y = 3;
+    game.hardDrop();
+    assert.equal(game.score, 15 * (1 + Math.floor(lines / 10)));
+  }
+});
+
+test('grounded hard drop awards zero distance and adds row-clear points separately', () => {
+  const game = grounded();
+  game.hardDrop();
+  assert.equal(game.score, 0);
+  game.reset();
+  game.type = 3;
+  game.x = 4;
+  game.y = 5;
+  for (const y of [18, 19])
+    game.board[y] = Array.from({ length: 10 }, (_, x) => (x === 4 || x === 5 ? 0 : 1));
+  game.hardDrop();
+  assert.equal(game.score, 13 + 300);
 });

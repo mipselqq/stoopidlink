@@ -279,7 +279,9 @@ export class Tetris {
   }
   hardDrop() {
     if (this.over) return;
-    this.y = this.ghostY;
+    const landingY = this.ghostY;
+    this.score += (landingY - this.y) * (1 + Math.floor(this.lines / 10));
+    this.y = landingY;
     this.lock();
   }
   private lock() {

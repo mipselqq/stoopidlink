@@ -31,8 +31,8 @@ func validGameResult(input gameResult) bool {
 	case "flappy":
 		return input.Value <= 10000
 	case "tetris":
-		// Only cleared rows award points, in multiples of 100.
-		return input.Value <= 10000000 && input.Value%100 == 0
+		// Hard drops award distance times level, so any positive integer is valid.
+		return input.Value <= 10000000
 	}
 	return false
 }
