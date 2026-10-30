@@ -64,16 +64,22 @@ test('holding Space drops one piece and awards no points without cleared rows', 
   }
   class Best {
     begin() {}
-    submit() {}
+    submit(value: number) {
+      submitted.push(value);
+    }
   }
-  mount(Shell, {}, Best, Model, SHAPES)({});
+  const submitted: number[] = [];
+  mount(Shell, {}, Best, Model, SHAPES)(new EventTarget());
   assert.deepEqual(buttons, ['↻', '←', '↓', '→', 'DROP']);
   game!.running = true;
   game!.input(' ', true, false);
   game!.draw();
   assert.equal(game!.score, '0');
   const blocks = filled();
-  for (let i = 0; i < 100; i++) game!.input(' ', true, true);
+  for (let i = 0; i < 100; i++) {
+    game!.input(' ', true, true);
+    game!.input(' ', true, false);
+  }
   game!.draw();
   assert.equal(filled(), blocks, 'auto-repeat must not drop the following pieces');
   assert.equal(game!.score, '0');
@@ -82,6 +88,23 @@ test('holding Space drops one piece and awards no points without cleared rows', 
   game!.draw();
   assert.equal(filled(), blocks + 4, 'a fresh press drops the next piece');
   assert.equal(game!.score, '0');
+  for (let i = 0; i < 200; i++) {
+    game!.input(' ', false, false);
+    game!.input(' ', true, false);
+  }
+  assert.equal(model!.over, true);
+  game!.draw();
+  assert.equal(game!.score, '0');
+  assert.deepEqual(submitted, [0], 'a zero-score loss never becomes a positive submission');
+  const finalBoard = structuredClone(model!.board);
+  game!.running = true;
+  for (let i = 0; i < 200; i++) {
+    game!.input(' ', false, false);
+    game!.input(' ', true, false);
+  }
+  assert.deepEqual(model!.board, finalBoard);
+  assert.equal(model!.score, 0);
+  assert.deepEqual(submitted, [0]);
 });
 
 const grounded = () => {
@@ -209,4 +232,18 @@ test('line clearing keeps existing scoring and reset clears game state', () => {
   assert.equal(game.lines, 0);
   assert.equal(game.over, false);
   assert.equal(game.lockResets, 0);
+});
+
+test('rapid hard drops keep zero score across varied bags, including after game over', () => {
+  for (let seed = 1; seed <= 1000; seed++) {
+    let random = seed;
+    const game = new Tetris(() => {
+      random = (Math.imul(random, 1664525) + 1013904223) >>> 0;
+      return random / 2 ** 32;
+    });
+    for (let press = 0; press < 100; press++) game.hardDrop();
+    assert.equal(game.over, true);
+    assert.equal(game.lines, 0);
+    assert.equal(game.score, 0);
+  }
 });

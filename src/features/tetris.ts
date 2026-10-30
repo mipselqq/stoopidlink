@@ -15,6 +15,22 @@ export function mount(host: HTMLElement) {
   const best = new GameBest(game, { game: 'tetris', level: 0 });
   const state = new Tetris();
   let submitted = false;
+  let spaceHeld = false;
+  const inputAbort = new AbortController();
+  host.addEventListener(
+    'focusout',
+    () => {
+      spaceHeld = false;
+    },
+    { signal: inputAbort.signal },
+  );
+  host.ownerDocument?.defaultView?.addEventListener(
+    'blur',
+    () => {
+      spaceHeld = false;
+    },
+    { signal: inputAbort.signal },
+  );
   const finish = () => {
     if (!state.over || submitted) return;
     submitted = true;
@@ -36,12 +52,17 @@ export function mount(host: HTMLElement) {
   const drop = () => act(() => state.softDrop());
   const hard = () => act(() => state.hardDrop());
   game.keys((key, down, repeat) => {
+    if (key === ' ') {
+      const freshPress = down && !repeat && !spaceHeld;
+      spaceHeld = down;
+      if (freshPress) hard();
+      return;
+    }
     if (!down) return;
     if (key === 'arrowleft' || key === 'a') move(-1);
     if (key === 'arrowright' || key === 'd') move(1);
     if (key === 'arrowup' || key === 'w') rotate();
     if (key === 'arrowdown' || key === 's') drop();
-    if (key === ' ' && !repeat) hard();
   });
   game.button('↻', rotate, undefined, false, '↑');
   game.button('←', () => move(-1), undefined, true);
@@ -104,6 +125,7 @@ export function mount(host: HTMLElement) {
     },
   );
   return () => {
+    inputAbort.abort();
     best.dispose();
     game.dispose();
   };
