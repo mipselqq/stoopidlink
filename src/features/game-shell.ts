@@ -21,17 +21,24 @@ export class GameShell {
   private resize: ResizeObserver;
   private releaseControls: (() => void)[] = [];
   onReset = () => {};
-  constructor(readonly host: HTMLElement) {
+  constructor(
+    readonly host: HTMLElement,
+    { fitCanvas = false } = {},
+  ) {
     host.innerHTML = `<div class="module-toolbar game-toolbar"><span class="module-status" role="status"><span class="module-message">STANDBY</span><span class="module-best" hidden></span></span><button class="module-button" data-play>START <kbd class="game-key">P</kbd></button><button class="module-button" data-reset>RESTART</button></div><div class="game-stage"><canvas class="game-canvas" width="640" height="360" tabindex="0" aria-label="Station training simulation"></canvas></div><div class="game-pad"></div>`;
     this.canvas = host.querySelector('canvas')!;
     this.ctx = this.canvas.getContext('2d')!;
     this.resize = new ResizeObserver(() => {
       if (!this.canvas.clientWidth || !this.canvas.clientHeight) return;
-      const width = Math.min(
-        4096,
-        Math.max(640, Math.round((360 * this.canvas.clientWidth) / this.canvas.clientHeight)),
-      );
+      const width = fitCanvas
+        ? Math.max(1, Math.round(this.canvas.clientWidth))
+        : Math.min(
+            4096,
+            Math.max(640, Math.round((360 * this.canvas.clientWidth) / this.canvas.clientHeight)),
+          );
+      const height = fitCanvas ? Math.max(1, Math.round(this.canvas.clientHeight)) : 360;
       if (this.canvas.width !== width) this.canvas.width = width;
+      if (this.canvas.height !== height) this.canvas.height = height;
       this.invalidate();
     });
     this.resize.observe(this.canvas);
@@ -193,7 +200,7 @@ export class GameShell {
   }
   clear() {
     this.ctx.fillStyle = COLORS.bg;
-    this.ctx.fillRect(0, 0, this.width, 360);
+    this.ctx.fillRect(0, 0, this.width, this.canvas.height);
   }
   text(text: string, x: number, y: number, color = COLORS.white, size = 16) {
     this.ctx.font = `${size}px Jix,monospace`;

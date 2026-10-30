@@ -31,11 +31,18 @@ test('holding Space drops one piece and awards no points without cleared rows', 
   class Shell {
     running = false;
     width = 640;
+    canvas = { height: 360 };
     blocks = 0;
     score = '';
+    previousText = '';
     input = (_key: string, _down: boolean, _repeat: boolean) => {};
     draw = () => {};
     ctx = {
+      save() {},
+      restore() {},
+      beginPath() {},
+      rect() {},
+      clip() {},
       strokeRect() {},
       fillRect: () => this.blocks++,
     };
@@ -55,7 +62,8 @@ test('holding Space drops one piece and awards no points without cleared rows', 
       this.blocks = 0;
     }
     text(value: string, _x: number, y: number) {
-      if (y === 145) this.score = value;
+      if (this.previousText === 'SCORE') this.score = value;
+      this.previousText = value;
     }
     message() {}
     setRunning(value: boolean) {
