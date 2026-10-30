@@ -1,32 +1,6 @@
 import { GameShell, COLORS } from './game-shell.ts';
 import { GameBest } from './game-best.ts';
-const SHAPES = [
-  [[1, 1, 1, 1]],
-  [
-    [1, 0, 0],
-    [1, 1, 1],
-  ],
-  [
-    [0, 0, 1],
-    [1, 1, 1],
-  ],
-  [
-    [1, 1],
-    [1, 1],
-  ],
-  [
-    [0, 1, 1],
-    [1, 1, 0],
-  ],
-  [
-    [0, 1, 0],
-    [1, 1, 1],
-  ],
-  [
-    [1, 1, 0],
-    [0, 1, 1],
-  ],
-];
+import { Tetris, SHAPES } from './tetris-engine.ts';
 const palette = [
   COLORS.cyan,
   '#75aaff',
@@ -39,95 +13,28 @@ const palette = [
 export function mount(host: HTMLElement) {
   const game = new GameShell(host);
   const best = new GameBest(game, { game: 'tetris', level: 0 });
-  let board: number[][] = [],
-    piece: number[][] = [],
-    x = 3,
-    y = 0,
-    type = 0,
-    next = 0,
-    bag: number[] = [],
-    lines = 0,
-    score = 0,
-    clock = 0,
-    over = false;
-  const take = () => {
-    if (!bag.length) bag = [0, 1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
-    return bag.pop()!;
-  };
-  const collide = (m = piece, px = x, py = y) =>
-    m.some((row, dy) =>
-      row.some(
-        (v, dx) =>
-          v &&
-          (px + dx < 0 ||
-            px + dx >= 10 ||
-            py + dy >= 20 ||
-            (py + dy >= 0 && board[py + dy][px + dx])),
-      ),
-    );
-  const spawn = () => {
-    type = next;
-    next = take();
-    piece = SHAPES[type].map((r) => [...r]);
-    x = Math.floor((10 - piece[0].length) / 2);
-    y = 0;
-    if (collide()) {
-      over = true;
-      game.setRunning(false);
-      best.submit(score);
-    }
+  const state = new Tetris();
+  let submitted = false;
+  const finish = () => {
+    if (!state.over || submitted) return;
+    submitted = true;
+    game.setRunning(false);
+    best.submit(state.score);
   };
   const reset = () => {
+    submitted = false;
     best.begin();
-    board = Array.from({ length: 20 }, () => Array(10).fill(0));
-    bag = [];
-    lines = score = clock = 0;
-    over = false;
-    next = take();
-    spawn();
+    state.reset();
   };
-  const lock = () => {
-    piece.forEach((row, dy) =>
-      row.forEach((v, dx) => {
-        if (v && y + dy >= 0) board[y + dy][x + dx] = type + 1;
-      }),
-    );
-    let cleared = 0;
-    board = board.filter((r) => {
-      if (r.every(Boolean)) {
-        cleared++;
-        return false;
-      }
-      return true;
-    });
-    while (board.length < 20) board.unshift(Array(10).fill(0));
-    lines += cleared;
-    score += [0, 100, 300, 500, 800][cleared] * (1 + Math.floor(lines / 10));
-    spawn();
+  const act = (action: () => void) => {
+    if (!game.running || state.over) return;
+    action();
+    finish();
   };
-  const drop = () => {
-    if (!game.running || over) return;
-    if (!collide(piece, x, y + 1)) y++;
-    else lock();
-  };
-  const move = (dx: number) => {
-    if (game.running && !collide(piece, x + dx, y)) x += dx;
-  };
-  const rotate = () => {
-    if (!game.running) return;
-    const m = piece[0].map((_, i) => piece.map((r) => r[i]).reverse());
-    for (const kick of [0, -1, 1, -2, 2])
-      if (!collide(m, x + kick, y)) {
-        piece = m;
-        x += kick;
-        return;
-      }
-  };
-  const hard = () => {
-    if (!game.running || over) return;
-    while (!collide(piece, x, y + 1)) y++;
-    lock();
-  };
+  const move = (dx: number) => act(() => state.move(dx));
+  const rotate = () => act(() => state.rotate());
+  const drop = () => act(() => state.softDrop());
+  const hard = () => act(() => state.hardDrop());
   game.keys((key, down, repeat) => {
     if (!down) return;
     if (key === 'arrowleft' || key === 'a') move(-1);
@@ -136,8 +43,8 @@ export function mount(host: HTMLElement) {
     if (key === 'arrowdown' || key === 's') drop();
     if (key === ' ' && !repeat) hard();
   });
-  game.button('←', () => move(-1), undefined, true);
   game.button('↻', rotate, undefined, false, '↑');
+  game.button('←', () => move(-1), undefined, true);
   game.button('↓', drop, undefined, true);
   game.button('→', () => move(1), undefined, true);
   game.button('DROP', hard, undefined, false, '␣');
@@ -145,14 +52,12 @@ export function mount(host: HTMLElement) {
   reset();
   game.loop(
     (dt) => {
-      clock += dt;
-      if (clock >= Math.max(0.08, 0.7 - Math.floor(lines / 10) * 0.06)) {
-        clock = 0;
-        drop();
-      }
+      state.tick(dt);
+      finish();
     },
     () => {
       game.clear();
+      const { board, piece, x, y, type, next, lines, score, over } = state;
       const c = game.ctx,
         cell = 16,
         ox = game.width / 2 - 100,
@@ -160,6 +65,7 @@ export function mount(host: HTMLElement) {
       c.strokeStyle = COLORS.dim;
       c.strokeRect(ox - 1, oy - 1, 162, 322);
       const block = (px: number, py: number, color: string) => {
+        if (py < 0) return;
         c.fillStyle = color;
         c.fillRect(ox + px * cell + 1, oy + py * cell + 1, 14, 14);
       };
@@ -168,8 +74,7 @@ export function mount(host: HTMLElement) {
           if (v) block(px, py, palette[v - 1]);
         }),
       );
-      let ghost = y;
-      while (!collide(piece, x, ghost + 1)) ghost++;
+      const ghost = state.ghostY;
       piece.forEach((row, dy) =>
         row.forEach((v, dx) => {
           if (v) {
@@ -184,11 +89,12 @@ export function mount(host: HTMLElement) {
       game.text('SCORE', ox - 195, 120, COLORS.cyan);
       game.text(String(score), ox - 195, 145);
       game.text('NEXT', ox + 205, 70, COLORS.cyan);
+      const previewTop = SHAPES[next].findIndex((row) => row.some(Boolean));
       SHAPES[next].forEach((row, py) =>
         row.forEach((v, px) => {
           if (v) {
             c.fillStyle = palette[next];
-            c.fillRect(ox + 205 + px * 16, 90 + py * 16, 14, 14);
+            c.fillRect(ox + 205 + px * 16, 90 + (py - previewTop) * 16, 14, 14);
           }
         }),
       );

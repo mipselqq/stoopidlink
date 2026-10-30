@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { Tetris, SevenBag, SHAPES } from '../src/features/tetris-engine.ts';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
@@ -11,11 +12,22 @@ const mount = new Function(
   'GameShell',
   'COLORS',
   'GameBest',
+  'Tetris',
+  'SHAPES',
   `${stripTypeScriptTypes(source)}; return mount;`,
 );
 
 test('holding Space drops one piece and awards no points without cleared rows', () => {
   let game: Shell;
+  let model: Tetris;
+  class Model extends Tetris {
+    constructor() {
+      super(() => 0.5);
+      model = this;
+    }
+  }
+  const buttons: string[] = [];
+  const filled = () => model.board.flat().filter(Boolean).length;
   class Shell {
     running = false;
     width = 640;
@@ -33,7 +45,9 @@ test('holding Space drops one piece and awards no points without cleared rows', 
     keys(input: Shell['input']) {
       this.input = input;
     }
-    button() {}
+    button(label: string) {
+      buttons.push(label);
+    }
     loop(_step: unknown, draw: () => void) {
       this.draw = draw;
     }
@@ -52,19 +66,147 @@ test('holding Space drops one piece and awards no points without cleared rows', 
     begin() {}
     submit() {}
   }
-  mount(Shell, {}, Best)({});
+  mount(Shell, {}, Best, Model, SHAPES)({});
+  assert.deepEqual(buttons, ['↻', '←', '↓', '→', 'DROP']);
   game!.running = true;
   game!.input(' ', true, false);
   game!.draw();
   assert.equal(game!.score, '0');
-  const blocks = game!.blocks;
+  const blocks = filled();
   for (let i = 0; i < 100; i++) game!.input(' ', true, true);
   game!.draw();
-  assert.equal(game!.blocks, blocks, 'auto-repeat must not drop the following pieces');
+  assert.equal(filled(), blocks, 'auto-repeat must not drop the following pieces');
   assert.equal(game!.score, '0');
   game!.input(' ', false, false);
   game!.input(' ', true, false);
   game!.draw();
-  assert.equal(game!.blocks, blocks + 4, 'a fresh press drops the next piece');
+  assert.equal(filled(), blocks + 4, 'a fresh press drops the next piece');
   assert.equal(game!.score, '0');
+});
+
+const grounded = () => {
+  const game = new Tetris(() => 0.5);
+  game.type = 3;
+  game.rotation = 0;
+  game.x = 4;
+  game.y = 18;
+  return game;
+};
+
+test('each seven-bag contains every piece exactly once', () => {
+  let seed = 42;
+  const bag = new SevenBag(() => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 2 ** 32;
+  });
+  for (let i = 0; i < 100; i++) {
+    const pieces = Array.from({ length: 7 }, () => bag.next());
+    assert.deepEqual(pieces.sort(), [0, 1, 2, 3, 4, 5, 6]);
+  }
+});
+
+test('four SRS turns preserve each piece and reverse turns undo rotation', () => {
+  for (let type = 0; type < 7; type++) {
+    const game = new Tetris();
+    game.type = type;
+    game.x = 3;
+    game.y = 5;
+    const piece = game.piece;
+    for (let i = 0; i < 4; i++) game.rotate();
+    assert.deepEqual(game.piece, piece);
+    assert.equal(game.x, 3);
+    assert.equal(game.y, 5);
+    game.rotate();
+    game.rotate(-1);
+    assert.equal(game.rotation, 0);
+  }
+});
+
+test('SRS uses distinct I and JLSTZ wall and floor kicks', () => {
+  const game = new Tetris();
+  game.type = 5;
+  game.rotation = 1;
+  game.x = -1;
+  game.y = 5;
+  assert.equal(game.rotate(), true);
+  assert.equal(game.x, 0);
+  game.type = 0;
+  game.rotation = 1;
+  game.x = -2;
+  assert.equal(game.rotate(), true);
+  assert.equal(game.x, 0);
+  game.type = 5;
+  game.rotation = 0;
+  game.x = 3;
+  game.y = 18;
+  assert.equal(game.rotate(), true);
+  assert.deepEqual([game.x, game.y], [2, 17]);
+  game.type = 0;
+  game.rotation = 0;
+  game.x = 3;
+  game.y = 18;
+  assert.equal(game.rotate(), true);
+  assert.deepEqual([game.x, game.y], [4, 16]);
+});
+
+test('lock waits 500ms after contact, while hard drop locks immediately without points', () => {
+  const game = grounded();
+  game.tick(0.499);
+  assert.equal(game.board.flat().filter(Boolean).length, 0);
+  game.tick(0.001);
+  assert.equal(game.board.flat().filter(Boolean).length, 4);
+  assert.equal(game.score, 0);
+  game.hardDrop();
+  assert.equal(game.board.flat().filter(Boolean).length, 8);
+  assert.equal(game.score, 0);
+});
+
+test('time before ground contact does not count toward lock delay', () => {
+  const game = grounded();
+  game.y = 17;
+  game.tick(0.8);
+  game.tick(0.399);
+  assert.equal(game.board.flat().filter(Boolean).length, 0);
+  game.tick(0.001);
+  assert.equal(game.board.flat().filter(Boolean).length, 4);
+});
+
+test('successful grounded moves reset lock delay at most 15 times', () => {
+  const game = grounded();
+  for (let i = 0; i < 15; i++) {
+    game.tick(0.4);
+    assert.equal(game.move(i % 2 ? -1 : 1), true);
+  }
+  assert.equal(game.lockResets, 15);
+  game.tick(0.4);
+  game.move(-1);
+  game.tick(0.1);
+  assert.equal(game.board.flat().filter(Boolean).length, 4);
+});
+
+test('blocked moves and soft drops do not extend lock delay', () => {
+  const game = grounded();
+  game.x = 0;
+  game.tick(0.4);
+  assert.equal(game.move(-1), false);
+  assert.equal(game.softDrop(), false);
+  assert.equal(game.rotate(), false);
+  assert.equal(game.lockResets, 0);
+  game.tick(0.1);
+  assert.equal(game.board.flat().filter(Boolean).length, 4);
+});
+
+test('line clearing keeps existing scoring and reset clears game state', () => {
+  const game = grounded();
+  for (const y of [18, 19])
+    game.board[y] = Array.from({ length: 10 }, (_, x) => (x === 4 || x === 5 ? 0 : 1));
+  game.hardDrop();
+  assert.equal(game.lines, 2);
+  assert.equal(game.score, 300);
+  assert.equal(game.board.flat().filter(Boolean).length, 0);
+  game.reset();
+  assert.equal(game.score, 0);
+  assert.equal(game.lines, 0);
+  assert.equal(game.over, false);
+  assert.equal(game.lockResets, 0);
 });
